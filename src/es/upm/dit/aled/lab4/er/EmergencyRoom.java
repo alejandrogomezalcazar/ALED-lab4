@@ -15,7 +15,7 @@ import es.upm.dit.aled.lab4.er.gui.Position2D;
  * Models a hospital ER. It is characterized by a colletion of patients and the
  * areas that these patients will be treated in. Patients extends the class Thread.
  * 
- * @author rgarciacarmona
+ * @author rgarciacarmona, alejandrogomezalcazar
  */
 public class EmergencyRoom {
 
@@ -124,6 +124,7 @@ public class EmergencyRoom {
 	 */
 	public void admit(Patient patient) {
 		// TODO
+		patient.start();
 	}
 
 	/**
@@ -133,6 +134,10 @@ public class EmergencyRoom {
 	 */
 	public void waitForDischarge(Patient patient) {
 		// TODO
+		try {
+			patient.join();
+		} catch (InterruptedException e) {
+		}
 	}
 
 }

@@ -18,7 +18,7 @@ import es.upm.dit.aled.lab4.er.gui.Position2D;
  * Each Patient is represented graphically by a dot of diameter 10 px, centered
  * in a given position and with a custom color.
  * 
- * @author rgarciacarmona
+ * @author rgarciacarmona, alejandro.gomezalcazar
  */
 public class Patient extends Thread {
 
@@ -131,6 +131,9 @@ public class Patient extends Thread {
 	 */
 	private void advanceProtocol() {
 		// TODO
+		EmergencyRoomGUI.getInstance().animateTransfer(this, this.protocol.get(indexProtocol));
+		this.location = this.protocol.get(indexProtocol).getTo();
+		this.indexProtocol++;
 	}
 
 	/**
@@ -140,6 +143,10 @@ public class Patient extends Thread {
 	 */
 	private void attendedAtLocation() {
 		// TODO
+		try {
+			sleep(this.location.getTime());
+		} catch (InterruptedException e) {
+		}
 	}
 
 	/**
@@ -150,6 +157,11 @@ public class Patient extends Thread {
 	@Override
 	public void run() {
 		// TODO
+		while (this.indexProtocol < this.protocol.size()) {
+			this.attendedAtLocation();
+			this.advanceProtocol();
+		}
+		EmergencyRoomGUI.getInstance().removePatient(this);
 	}
 
 }
