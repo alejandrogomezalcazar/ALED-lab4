@@ -9,7 +9,7 @@ import java.util.concurrent.Callable;
  * byte[] array containing a genome. It looks for a specific pattern and returns
  * all matches.
  * 
- * @author rgarciacarmona
+ * @author rgarciacarmona, alejandro.gomezalcazar
  *
  */
 public class FASTASearchCallable implements Callable<List<Integer>> {
@@ -32,6 +32,10 @@ public class FASTASearchCallable implements Callable<List<Integer>> {
 	 */
 	public FASTASearchCallable(FASTAReaderThreads reader, int lo, int hi, byte[] pattern) {
 		// TODO
+		this.reader = reader;
+		this.lo = lo;
+		this.hi = hi;
+		this.pattern = pattern;
 	}
 
 	/**
@@ -45,7 +49,16 @@ public class FASTASearchCallable implements Callable<List<Integer>> {
 	@Override
 	public List<Integer> call() throws Exception {
 		// TODO
-		return null;
+		List<Integer> hits = new ArrayList<Integer>();
+		for (int i = lo; i < hi; i++) {
+			try {
+				if (compare(pattern,i))
+					hits.add(i);
+			} catch (FASTAException e) {
+				break;
+			}
+		}
+		return hits;
 	}
 
 	/*

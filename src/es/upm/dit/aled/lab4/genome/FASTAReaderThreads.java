@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -20,7 +21,7 @@ import java.util.concurrent.Future;
  * are valid, an int indicating how many bytes of the array are valid is also
  * stored. All valid characters will be at the beginning of the array.
  * 
- * @author mmiguel, rgarciacarmona
+ * @author mmiguel, rgarciacarmona, alejandro.gomezalcazar
  *
  */
 public class FASTAReaderThreads {
@@ -116,7 +117,33 @@ public class FASTAReaderThreads {
 	 */
 	public List<Integer> search(byte[] pattern) {
 		// TODO
-		return null;
+		List<Integer> lista = new ArrayList<Integer>();
+		
+		int cores = Runtime.getRuntime().availableProcessors();
+		System.out.println("Tenemos " + cores + " cores");
+		ExecutorService executor = Executors.newFixedThreadPool(cores);
+		
+		Future<List<Integer>>[] futures = new Future[cores];
+		
+		int tamano = content.length / cores;
+		int lo = 0;
+		int hi = 0 + tamano;
+		
+		for (int i=0; i < cores; i++) {
+			Callable<List<Integer>> task = new FASTASearchCallable(this, lo, hi, pattern);
+			futures[i] = executor.submit(task);
+			lo += tamano;
+			hi += tamano;
+		}
+		
+		for (Future<List<Integer>> f : futures) {
+			try {
+				lista.addAll(f.get());
+			} catch (Exception e) {}
+		}
+		executor.shutdown();
+		
+		return lista;
 	}
 
 	public static void main(String[] args) {
